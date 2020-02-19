@@ -13,6 +13,7 @@ public class GUIInicio extends javax.swing.JFrame implements AView{
      * Creates new form GUIInicio
      */
     public GUIInicio() {
+       
         Utilidades.mensajeExito("Bienvenido", "Inicio Exitoso");
         initComponents();
     }
@@ -30,9 +31,7 @@ public class GUIInicio extends javax.swing.JFrame implements AView{
         jMenuBar2 = new javax.swing.JMenuBar();
         mnuOpciones = new javax.swing.JMenu();
         mnuRegIngreso = new javax.swing.JMenuItem();
-        mnuRegSalida = new javax.swing.JMenuItem();
         mnuRegMulta = new javax.swing.JMenuItem();
-        mnuMapa = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -43,30 +42,22 @@ public class GUIInicio extends javax.swing.JFrame implements AView{
         dskEscritorio.setLayout(dskEscritorioLayout);
         dskEscritorioLayout.setHorizontalGroup(
             dskEscritorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 860, Short.MAX_VALUE)
+            .addGap(0, 712, Short.MAX_VALUE)
         );
         dskEscritorioLayout.setVerticalGroup(
             dskEscritorioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 392, Short.MAX_VALUE)
+            .addGap(0, 554, Short.MAX_VALUE)
         );
 
         mnuOpciones.setText("Opciones");
 
-        mnuRegIngreso.setText("Registrar Ingreso");
+        mnuRegIngreso.setText("Buscar Conductor");
         mnuRegIngreso.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 mnuRegIngresoActionPerformed(evt);
             }
         });
         mnuOpciones.add(mnuRegIngreso);
-
-        mnuRegSalida.setText("Registrar Salida");
-        mnuRegSalida.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuRegSalidaActionPerformed(evt);
-            }
-        });
-        mnuOpciones.add(mnuRegSalida);
 
         mnuRegMulta.setText("Registrar Multa");
         mnuRegMulta.addActionListener(new java.awt.event.ActionListener() {
@@ -78,9 +69,6 @@ public class GUIInicio extends javax.swing.JFrame implements AView{
 
         jMenuBar2.add(mnuOpciones);
 
-        mnuMapa.setText("Mapa del Estacionamiento");
-        jMenuBar2.add(mnuMapa);
-
         setJMenuBar(jMenuBar2);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -91,7 +79,9 @@ public class GUIInicio extends javax.swing.JFrame implements AView{
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(dskEscritorio)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(dskEscritorio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         pack();
@@ -109,27 +99,22 @@ public class GUIInicio extends javax.swing.JFrame implements AView{
         objIngreso.show();
     }//GEN-LAST:event_mnuRegIngresoActionPerformed
 
-    private void mnuRegSalidaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuRegSalidaActionPerformed
-        Utilidades.mensajeAdvertencia("En construccion", "Advertencia");
-        
-        // TODO add your handling code here:
-    }//GEN-LAST:event_mnuRegSalidaActionPerformed
-
     private void mnuRegMultaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuRegMultaActionPerformed
-        Utilidades.mensajeAdvertencia("En construccion", "Advertencia");
-            
+        GUIRegistroMulta objMultas = new GUIRegistroMulta();
+        GUIInicio.dskEscritorio.add(objMultas);
+        objMultas.toFront();
+        objMultas.setVisible(true);
+
         // TODO add your handling code here:
     }//GEN-LAST:event_mnuRegMultaActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JDesktopPane dskEscritorio;
+    public static javax.swing.JDesktopPane dskEscritorio;
     private javax.swing.JMenuBar jMenuBar2;
-    private javax.swing.JMenu mnuMapa;
     private javax.swing.JMenu mnuOpciones;
     private javax.swing.JMenuItem mnuRegIngreso;
     private javax.swing.JMenuItem mnuRegMulta;
-    private javax.swing.JMenuItem mnuRegSalida;
     // End of variables declaration//GEN-END:variables
 
     @Override

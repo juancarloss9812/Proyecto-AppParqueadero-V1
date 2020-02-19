@@ -1,6 +1,7 @@
 package presentacion;
 
 import Utilidades.Utilidades;
+import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -40,6 +41,9 @@ public class GUIBuscarVehPersona extends javax.swing.JInternalFrame implements A
         lblinfPersona = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         tblVehiculos = new javax.swing.JTable();
+        jPanel1 = new javax.swing.JPanel();
+        jButton1 = new javax.swing.JButton();
+        btnregVehiculo = new javax.swing.JButton();
 
         setBackground(new java.awt.Color(0, 51, 153));
         setClosable(true);
@@ -114,6 +118,29 @@ public class GUIBuscarVehPersona extends javax.swing.JInternalFrame implements A
 
         pnlInfUsuario.add(jScrollPane2);
 
+        jPanel1.setBackground(new java.awt.Color(12, 61, 135));
+
+        jButton1.setForeground(new java.awt.Color(0, 51, 153));
+        jButton1.setText("REGISTRAR CONDUCTOR");
+        jButton1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton1);
+
+        btnregVehiculo.setForeground(new java.awt.Color(0, 51, 153));
+        btnregVehiculo.setText("REGISTRAR VEHICULO");
+        btnregVehiculo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnregVehiculoActionPerformed(evt);
+            }
+        });
+        jPanel1.add(btnregVehiculo);
+
+        pnlInfUsuario.add(jPanel1);
+
         getContentPane().add(pnlInfUsuario, java.awt.BorderLayout.CENTER);
 
         pack();
@@ -149,9 +176,29 @@ public class GUIBuscarVehPersona extends javax.swing.JInternalFrame implements A
         }
     }//GEN-LAST:event_txtNumeroIngresadoFocusLost
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        GUIRegistrarDatosConductor objRegistroConductor = new GUIRegistrarDatosConductor();
+        GUIInicio.dskEscritorio.add(objRegistroConductor);
+        objRegistroConductor.toFront();
+        objRegistroConductor.setVisible(true);
+        
+
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void btnregVehiculoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnregVehiculoActionPerformed
+        GUIRegistrarVehiculo objRegistroVehiculo = new GUIRegistrarVehiculo();
+        GUIInicio.dskEscritorio.add(objRegistroVehiculo);
+        objRegistroVehiculo.toFront();
+        objRegistroVehiculo.setVisible(true);
+
+    }//GEN-LAST:event_btnregVehiculoActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup GrupoBotones;
     private javax.swing.JButton btnBuscar;
+    private javax.swing.JButton btnregVehiculo;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lblInsertarNumero;
     private javax.swing.JLabel lblinfPersona;
@@ -174,6 +221,7 @@ public class GUIBuscarVehPersona extends javax.swing.JInternalFrame implements A
             lblinfPersona.setText(objPersona.getPerNombre()+" "+objPersona.getPerApellido()+"  "+objPersona.getPerRol());
         }
     }
+    
     //llena el arraylist con los dato entregados de gson
     public void llenarVehiculo(ArrayList<Vehiculo> vehiculos) {
         DefaultTableModel model = (DefaultTableModel) tblVehiculos.getModel();

@@ -32,7 +32,6 @@ public class GUIAutenticacionController extends AActionController {
 
     private void iniciarSesion() {
         String usuario = vista.getUsuario();
-
         String contraseña = vista.getContraseña();
         Vigilante objUsuario = gestor.Iniciar_Sesion(usuario);
         if (objUsuario != null && objUsuario.getVigUsuario().equals(usuario) && objUsuario.getVigContrasenia().equals(contraseña)) {
@@ -41,6 +40,10 @@ public class GUIAutenticacionController extends AActionController {
                 public void run() {
                     GUIInicio objInicio = new GUIInicio();
                     objInicio.setVisible(true);
+                    
+                    GUIMapaParqueadero objMapa= new GUIMapaParqueadero();
+                    objMapa.setLocation(720, 0);
+                    objMapa.setVisible(true);
                 }
             });
         } else {
@@ -48,3 +51,4 @@ public class GUIAutenticacionController extends AActionController {
         }
     }
 }
+///listend

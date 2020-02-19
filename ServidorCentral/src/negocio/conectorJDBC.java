@@ -82,4 +82,5 @@ public class conectorJDBC {
     public ResultSet getResultado() {
         return resultado;
     }
+    
 }

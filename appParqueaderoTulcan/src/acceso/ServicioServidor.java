@@ -11,12 +11,12 @@ import java.net.Socket;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import negocio.Persona;
+import negocio.Vehiculo;
+import negocio.multa;
 
-/**
- *
- * @author jhayber
- */
-public class ServicioServidor implements IServicios {
+
+public class ServicioServidor implements IServicios,IConductor,IVehiculo,Imulta {
     private final String IP_SERVIDOR = "localhost";
     private PrintStream salidaDecorada;
     private Scanner entradaDecorada;
@@ -127,6 +127,60 @@ public class ServicioServidor implements IServicios {
             Logger.getLogger(ServicioServidor.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+        return respuesta;
+    }
+
+    @Override
+    public String registrarConductor(Persona Conductor) {
+     String respuesta = null;
+        String accion = "registrarConductor";
+        String informacionConductor;
+        informacionConductor = Conductor.getPerIdentificacion() + "," + Conductor.getPerNombre() + "," + Conductor.getPerApellido() + "," + Conductor.getPerGenero() + "," + Conductor.getPerFechaNac() + "," + Conductor.getPerRol();
+        try {
+            conectar(IP_SERVIDOR, PUERTO);
+            respuesta = leerFlujoEntradaSalida(accion + "," + informacionConductor);
+            cerrarFlujos();
+            desconectar();
+        } catch (IOException ex) {
+            Logger.getLogger(ServicioServidor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return respuesta;
+    }
+
+    
+    @Override
+    public String registrarVehiculo(Vehiculo prmVehiculo) {
+        String respuesta = null;
+        String accion = "registrarDatosVehiculo";
+        String informacionVehiculo;
+        informacionVehiculo = prmVehiculo.getPerIdentificacion() + "," + prmVehiculo.getVehPlaca() + "," + prmVehiculo.getVehMarca() + "," + prmVehiculo.getVehTipo();
+        try {
+            conectar(IP_SERVIDOR, PUERTO);
+            respuesta = leerFlujoEntradaSalida(accion + "," + informacionVehiculo);
+            cerrarFlujos();
+            desconectar();
+        } catch (IOException ex) {
+            Logger.getLogger(ServicioServidor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return respuesta;
+    }
+
+    @Override
+    public String registrarMulta(multa prmMulta) {
+         String respuesta = null;
+        String accion = "registrarDatosMulta";
+        String informacionMulta;
+        
+        informacionMulta = prmMulta.getMulid() + "," + prmMulta.getPlaca()+ "," + prmMulta.getMulfecha()+ "," + prmMulta.getMuldescripcion()+ "," + prmMulta.getMulFotos();
+        try {
+            conectar(IP_SERVIDOR, PUERTO);
+            respuesta = leerFlujoEntradaSalida(accion + "," + informacionMulta);
+            cerrarFlujos();
+            desconectar();
+        } catch (IOException ex) {
+            Logger.getLogger(ServicioServidor.class.getName()).log(Level.SEVERE, null, ex);
+        }
         return respuesta;
     }
 }

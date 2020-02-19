@@ -72,7 +72,6 @@
               </Group>
               <Group type="102" alignment="0" attributes="0">
                   <Group type="103" groupAlignment="1" attributes="0">
-                      <Component id="btnIniciar" min="-2" max="-2" attributes="0"/>
                       <Group type="102" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" attributes="0">
@@ -89,6 +88,10 @@
                               <Component id="txtContrasenia" pref="174" max="32767" attributes="0"/>
                               <Component id="txtUsuario" max="32767" attributes="0"/>
                           </Group>
+                      </Group>
+                      <Group type="102" alignment="1" attributes="0">
+                          <EmptySpace min="-2" pref="109" max="-2" attributes="0"/>
+                          <Component id="btnIniciar" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace min="-2" pref="257" max="-2" attributes="0"/>
@@ -137,6 +140,9 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txtUsuario">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="cRomero"/>
+          </Properties>
         </Component>
         <Component class="javax.swing.JPasswordField" name="txtContrasenia">
           <Events>

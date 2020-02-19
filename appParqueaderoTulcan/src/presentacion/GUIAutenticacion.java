@@ -54,6 +54,8 @@ public class GUIAutenticacion extends javax.swing.JFrame implements AView{
         lbUsuario.setFont(new java.awt.Font("Times New Roman", 0, 18)); // NOI18N
         lbUsuario.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
 
+        txtUsuario.setText("cRomero");
+
         txtContrasenia.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtContraseniaActionPerformed(evt);
@@ -103,7 +105,6 @@ public class GUIAutenticacion extends javax.swing.JFrame implements AView{
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
             .addGroup(pnlAutenticacionLayout.createSequentialGroup()
                 .addGroup(pnlAutenticacionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(btnIniciar)
                     .addGroup(pnlAutenticacionLayout.createSequentialGroup()
                         .addGroup(pnlAutenticacionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(pnlAutenticacionLayout.createSequentialGroup()
@@ -115,7 +116,10 @@ public class GUIAutenticacion extends javax.swing.JFrame implements AView{
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pnlAutenticacionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(txtContrasenia, javax.swing.GroupLayout.DEFAULT_SIZE, 174, Short.MAX_VALUE)
-                            .addComponent(txtUsuario))))
+                            .addComponent(txtUsuario)))
+                    .addGroup(pnlAutenticacionLayout.createSequentialGroup()
+                        .addGap(109, 109, 109)
+                        .addComponent(btnIniciar)))
                 .addGap(257, 257, 257))
         );
         pnlAutenticacionLayout.setVerticalGroup(

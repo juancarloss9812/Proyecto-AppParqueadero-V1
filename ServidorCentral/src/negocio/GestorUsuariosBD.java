@@ -51,4 +51,8 @@ public class GestorUsuariosBD {
         conector.desconectarse();
         return vehiculos;
     }
+
+    public multa buscarVehiculoPlaca(String conPlaca) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

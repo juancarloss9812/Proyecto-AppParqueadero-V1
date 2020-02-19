@@ -7,6 +7,7 @@ package servicio;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.ServerSocket;
@@ -17,18 +18,22 @@ import java.util.Scanner;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import negocio.GestorConductor;
+import negocio.GestorMulta;
 import negocio.GestorUsuariosBD;
+import negocio.GestorVehiculo;
 import negocio.Persona;
 import negocio.Vigilante;
 import negocio.Vehiculo;
+import negocio.multa;
 
-/**
- *
- * @author jhayber
- */
+
+
 public class servicioDB implements Runnable {
-
+    private final GestorVehiculo gestorVehiculo;
     private final GestorUsuariosBD gestorUsuarios;
+    private final GestorConductor gestorConductor;
+    private final GestorMulta gestorMulta;
     private static ServerSocket serverSocket;
     private static Socket socket;
     private Scanner entradaDecorada;
@@ -37,6 +42,9 @@ public class servicioDB implements Runnable {
 
     public servicioDB() {
         gestorUsuarios = new GestorUsuariosBD();
+        gestorConductor = new GestorConductor();
+        gestorVehiculo = new GestorVehiculo();
+        gestorMulta = new GestorMulta();
     }
 
     public void iniciar() {
@@ -103,7 +111,7 @@ public class servicioDB implements Runnable {
     /**
      * Lee los flujos del Socket
      */
-    private void leerFlujos() throws ClassNotFoundException, SQLException {
+    private void leerFlujos() throws ClassNotFoundException, SQLException, FileNotFoundException {
         if(entradaDecorada.hasNextLine()) 
         {
             //Extrae el flujo que envia el cliente
@@ -132,7 +140,7 @@ public class servicioDB implements Runnable {
      * @param peticion petición completa al estilo
      * "accion, informacion"
      */
-    private void decodificarPeticion(String peticion) throws ClassNotFoundException, SQLException
+    private void decodificarPeticion(String peticion) throws ClassNotFoundException, SQLException, FileNotFoundException
     {
         StringTokenizer tokens = new StringTokenizer(peticion, ",");
         String parametros[] = new String[15];
@@ -144,7 +152,7 @@ public class servicioDB implements Runnable {
         String accion = parametros[0];
         procesarAccion(accion, parametros);
     }
-    private void procesarAccion(String accion, String parametros[]) throws ClassNotFoundException, SQLException {
+    private void procesarAccion(String accion, String parametros[]) throws ClassNotFoundException, SQLException, FileNotFoundException {
         /**
          * Atributos para usuario
          */
@@ -176,6 +184,23 @@ public class servicioDB implements Runnable {
                     salidaDecorada.println(objJson.toString());
                 }
                 break;
+            case "registrarConductor":
+                Persona persona;
+                cod = Integer.parseInt(parametros[1]);
+                String nombre = parametros[2];
+                String apellido = parametros[3];
+                String genero = parametros[4];
+                String fechaNac = parametros[5];
+                String rol = parametros[6];
+                persona = gestorUsuarios.buscarUsuario(cod);
+                if (persona == null){
+                    persona = new Persona(cod, nombre, apellido, genero, fechaNac, rol);
+                    gestorConductor.registrarConductor(persona);
+                    salidaDecorada.println("Conductor agregado con exito");
+                }else{
+                    salidaDecorada.println("Conductor ya registrado");
+                }
+            
             case "vehiculo":
                 cod = Integer.parseInt(parametros[1]);
                 ArrayList<Vehiculo> objVehiculo = gestorUsuarios.buscarVehiculo(cod);                
@@ -185,9 +210,54 @@ public class servicioDB implements Runnable {
                 else{
                     salidaDecorada.println(serializarVehiculos(objVehiculo));
                 }
-            break;
+                break;
+            case "registrarDatosVehiculo":
+                int idConductor = Integer.parseInt(parametros[1]);
+                String placa = parametros[2];
+                String marca = parametros[3];
+                String tipoVehiculo = parametros[4];
+                ArrayList<Vehiculo> objVehiculos = gestorUsuarios.buscarVehiculo(idConductor);
+                System.out.println("Id: " + idConductor);
+                //cuantos vehiculos hay en el usuario
+                System.out.println("Tamaño: " + objVehiculos.size());
+                if (objVehiculos.size() == 0){
+                    Vehiculo objVehi = new Vehiculo(idConductor,placa , marca, tipoVehiculo);
+                    gestorVehiculo.registrarVehiculo(objVehi);
+                    salidaDecorada.println("Vehiculo agregado con exito");
+                }else{
+                    salidaDecorada.println("Vehiculo ya registrado");
+                }
+            case "registrarMulta":
+                multa objmulta;
+                int mulid=Integer.parseInt(parametros[1]);
+                String conPlaca =parametros[2];
+                String muldescripcion=parametros[3];
+                String mulfecha = parametros[4];
+                String ruta = parametros[5];
+                
+                objmulta = gestorUsuarios.buscarVehiculoPlaca(conPlaca);
+                if (objmulta == null){
+                    objmulta = new multa(mulid, conPlaca, muldescripcion, mulfecha, ruta);
+                    gestorMulta.registrarMulta(objmulta);
+                    salidaDecorada.println("Multa agregado con exito");
+                }else{
+                    salidaDecorada.println("Multa ya registrado");
+                }
+             
         }
     }
+    
+    private JsonObject parseToJSONMulta(multa objMulta)
+    {   
+        JsonObject jsonobj = new JsonObject();
+        jsonobj.addProperty("mulid", objMulta.getMulid());
+        jsonobj.addProperty("conPlaca", objMulta.getPlaca());
+        jsonobj.addProperty("muldescripcion", objMulta.getMuldescripcion());
+        jsonobj.addProperty("mulfecha", objMulta.getMulfecha());
+        jsonobj.addProperty("ruta", objMulta.getRuta());
+        return jsonobj;
+    }
+    
     private JsonObject parseToJSONUsuario(Vigilante objUsuario)
     {   
         JsonObject jsonobj = new JsonObject();
