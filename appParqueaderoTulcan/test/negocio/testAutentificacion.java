@@ -1,9 +1,5 @@
 package negocio;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -25,8 +21,8 @@ public class testAutentificacion {
         assertEquals("123", result.getVigContrasenia());
         assertEquals("Cesar", result.getVigNombres());
         assertEquals("Romero", result.getVigApellidos());
-        assertEquals("Seguro S.A", result.getVigEmpresa());
-        assertEquals("Masculino", result.getVigGenero());
+        assertEquals("Seguros S.A", result.getVigEmpresa());
+        assertEquals("MASCULINO", result.getVigGenero());
     
          
      }

@@ -6,10 +6,7 @@
 package negocio;
 
 import java.util.ArrayList;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -28,10 +25,10 @@ public class GestorVehiculoPersonaTest {
     @Test
     public void testBuscarPersona() {
         GestorVehiculoPersona gestor = new GestorVehiculoPersona();
-        ArrayList<Vehiculo> result = gestor.BuscarVeh(4);
-        assertEquals("VKH-200", result.get(0).getVehPlaca());
+        ArrayList<Vehiculo> result = gestor.BuscarVeh(2);
+        assertEquals("XSA-266", result.get(0).getVehPlaca());
         assertEquals("Automovil", result.get(0).getVehTipo());
-        assertEquals("LOGAN", result.get(0).getVehMarca());
+        assertEquals("KIA", result.get(0).getVehMarca());
 
     }
 

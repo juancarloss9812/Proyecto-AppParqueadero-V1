@@ -5,6 +5,7 @@ import negocio.GestorUsuario;
 import negocio.Vigilante;
 import Utilidades.Utilidades;
 import java.awt.Button;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import mvcf.AModel;
 import mvcf.AView;
@@ -14,12 +15,14 @@ public class GUIAutenticacion extends javax.swing.JFrame implements AView{
      * Creates new form GUIAutenticacion
      */
     public GUIAutenticacion() {
+         this.setIconImage(new ImageIcon(getClass().getResource("/imagenes/carro.png")).getImage());
         setSize(500,500);
         //Establecer la ubicacion de la ventana
         setLocationRelativeTo(null);
         setTitle("LOGIN");
         initComponents();
         accion = "IniciarSesion";
+        
     }
 
     /**

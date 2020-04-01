@@ -5,26 +5,39 @@
  */
 package negocio;
 
+
 /**
  *
  * @author JUAN
  */
 public class multa {
-    private int mulid;
     private String placa;
     private String muldescripcion;
     private String mulfecha;
     private String ruta;
+    private String perIdentificacion;
+    
+    
 
     public multa() {
+    
     }
 
-    public multa(int mulid, String placa, String muldescripcion, String mulfecha, String ruta) {
-        this.mulid = mulid;
+    public multa(String placa, String muldescripcion, String mulfecha, String ruta, String perIdentificacion) {
         this.placa = placa;
         this.muldescripcion = muldescripcion;
         this.mulfecha = mulfecha;
         this.ruta = ruta;
+        this.perIdentificacion = perIdentificacion;
+    }
+
+    
+    public String getPerIdentificacion() {
+        return perIdentificacion;
+    }
+
+    public void setPerIdentificacion(String perIdentificacion) {
+        this.perIdentificacion = perIdentificacion;
     }
 
     public String getRuta() {
@@ -33,15 +46,6 @@ public class multa {
 
     public void setRuta(String ruta) {
         this.ruta = ruta;
-    }
-
-
-    public int getMulid() {
-        return mulid;
-    }
-
-    public void setMulid(int mulid) {
-        this.mulid = mulid;
     }
 
     public String getPlaca() {
@@ -60,14 +64,14 @@ public class multa {
         this.muldescripcion = muldescripcion;
     }
 
-    public String getMulfecha() {
-        return mulfecha;
-    }
 
     public void setMulfecha(String mulfecha) {
         this.mulfecha = mulfecha;
     }
 
+    public String getMulfecha() {
+        return mulfecha;
+    }
 
   
 }

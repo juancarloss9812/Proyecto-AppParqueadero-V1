@@ -52,11 +52,9 @@ public class GUIRegistrarDatosConductor extends javax.swing.JInternalFrame imple
         btnGuardar = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
         txbCedulal = new javax.swing.JTextField();
+        jcDia = new com.toedter.components.JSpinField();
         jcMes = new com.toedter.calendar.JMonthChooser();
         jcAño = new com.toedter.calendar.JYearChooser();
-        jcDia = new com.toedter.components.JSpinField();
-        btnRegistrarVehiculo = new java.awt.Button();
-        tbnCancelar = new javax.swing.JButton();
 
         setClosable(true);
 
@@ -93,7 +91,7 @@ public class GUIRegistrarDatosConductor extends javax.swing.JInternalFrame imple
         rbMujer.setText("MUJER");
 
         cbxRol.setForeground(new java.awt.Color(12, 61, 135));
-        cbxRol.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "ESTUDIANTE", "DONCENTE", "AMBOS" }));
+        cbxRol.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "ESTUDIANTE", "DONCENTE", "ESTUDIANTE Y DOCENTE", "ADMINISTRATIVO" }));
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/unicauca.png"))); // NOI18N
 
@@ -112,24 +110,8 @@ public class GUIRegistrarDatosConductor extends javax.swing.JInternalFrame imple
         jLabel4.setForeground(new java.awt.Color(255, 255, 255));
         jLabel4.setText("CEDULA:");
 
-        jcAño.setYear(2000);
-
-        btnRegistrarVehiculo.setActionCommand("REGISTRAR VEHICULOS");
-        btnRegistrarVehiculo.setForeground(new java.awt.Color(12, 61, 135));
-        btnRegistrarVehiculo.setLabel("REGISTRAR VEHICULOS");
-        btnRegistrarVehiculo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnRegistrarVehiculoActionPerformed(evt);
-            }
-        });
-
-        tbnCancelar.setForeground(new java.awt.Color(12, 61, 135));
-        tbnCancelar.setText("CANCELAR");
-        tbnCancelar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tbnCancelarActionPerformed(evt);
-            }
-        });
+        jcAño.setEndYear(2003);
+        jcAño.setValue(2000);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -155,32 +137,26 @@ public class GUIRegistrarDatosConductor extends javax.swing.JInternalFrame imple
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(11, 11, 11)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(btnGuardar)
                                     .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addComponent(btnGuardar)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(btnRegistrarVehiculo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(lblRol)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(cbxRol, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(tbnCancelar)
-                                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                                .addComponent(lblRol)
-                                                .addGap(18, 18, 18)
-                                                .addComponent(cbxRol, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                                .addComponent(lblgenero)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(rbHombre)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(rbMujer))
-                                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                                .addComponent(lblFechaNacimiento)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(jcDia, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(4, 4, 4)
-                                                .addComponent(jcMes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(jcAño, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                        .addGap(0, 0, Short.MAX_VALUE))))))
+                                        .addComponent(lblgenero)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(rbHombre)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(rbMujer))
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(lblFechaNacimiento)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jcDia, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jcMes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(jcAño, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(0, 0, Short.MAX_VALUE))))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(67, 67, 67)
@@ -205,28 +181,24 @@ public class GUIRegistrarDatosConductor extends javax.swing.JInternalFrame imple
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblApellidoConductor)
                     .addComponent(tbxapellidoConductor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblgenero)
                     .addComponent(rbHombre)
                     .addComponent(rbMujer))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(22, 22, 22)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblFechaNacimiento)
-                    .addComponent(jcAño, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jcDia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jcMes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jcDia, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jcMes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jcAño, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cbxRol, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblRol))
                 .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnGuardar)
-                    .addComponent(btnRegistrarVehiculo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tbnCancelar)
-                .addGap(18, 18, 18))
+                .addComponent(btnGuardar)
+                .addGap(53, 53, 53))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -246,46 +218,30 @@ public class GUIRegistrarDatosConductor extends javax.swing.JInternalFrame imple
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-        String respuesta;
-        String confirmacion;
-        String id = getIdentificacion();
-        String nombre = getNombre();
-        String apellido = getApellido();
-        String genero = getGenero();
-        String fechaNacimiento = getFechaNacimiento();
-        String rol = getRol();
-        Persona conductor = gestorUsuario.BuscarPersona(Integer.parseInt(id));
-        if (conductor == null){
-            conductor = new Persona(id, nombre, apellido, genero, fechaNacimiento, rol);
-            confirmacion = gestorConductor.registrarConductor(conductor);
-            Utilidades.Utilidades.mensajeExito(confirmacion, "Registro Exitoso.");
+        if(!camposNulos()){
+            String respuesta;
+            String confirmacion;
+            String id = getIdentificacion();
+            String nombre = getNombre();
+            String apellido = getApellido();
+            String genero = getGenero();
+            String fechaNacimiento = getFechaNacimiento();
+            String rol = getRol();
+            Persona conductor = gestorUsuario.BuscarPersona(Integer.parseInt(id));
+            if (conductor == null){
+                conductor = new Persona(id, nombre, apellido, genero, fechaNacimiento, rol);
+                confirmacion = gestorConductor.registrarConductor(conductor);
+                Utilidades.Utilidades.mensajeExito(confirmacion, "Registro Exitoso.");
 
-        }else{
-            Utilidades.Utilidades.mensajeError("El Conductor con esa identificación ya se encuentra registrado.", "Advertencia");
+            }else{
+                Utilidades.Utilidades.mensajeError("El Conductor con esa identificación ya se encuentra registrado.", "Advertencia");
+            }
         }
-        PreguntaRegistro();
     }//GEN-LAST:event_btnGuardarActionPerformed
-    public void PreguntaRegistro(){
-        int valor = JOptionPane.showConfirmDialog(this,"Desea registrar otro conductor?","Informacion",JOptionPane.YES_NO_OPTION);
-        if(valor == JOptionPane.YES_OPTION){
-            setVisible(false);
-        }
-    }
-    private void btnRegistrarVehiculoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarVehiculoActionPerformed
-        GUIRegistrarVehiculo objRegVehiculo= new GUIRegistrarVehiculo();
-        GUIInicio.dskEscritorio.add(objRegVehiculo);
-        objRegVehiculo.toFront();
-        objRegVehiculo.setVisible(true);
-    }//GEN-LAST:event_btnRegistrarVehiculoActionPerformed
-
-    private void tbnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tbnCancelarActionPerformed
-        this.setVisible(false);
-    }//GEN-LAST:event_tbnCancelarActionPerformed
-
+   
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnGuardar;
-    private java.awt.Button btnRegistrarVehiculo;
     private javax.swing.JComboBox<String> cbxRol;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -301,7 +257,6 @@ public class GUIRegistrarDatosConductor extends javax.swing.JInternalFrame imple
     private javax.swing.JLabel lblnombreConductor;
     private javax.swing.JRadioButton rbHombre;
     private javax.swing.JRadioButton rbMujer;
-    private javax.swing.JButton tbnCancelar;
     private javax.swing.JTextField tbxapellidoConductor;
     private javax.swing.JTextField txbCedulal;
     private javax.swing.JTextField txbNombreConductor;
@@ -321,9 +276,11 @@ public class GUIRegistrarDatosConductor extends javax.swing.JInternalFrame imple
     public String getGenero(){
         if (rbMujer.isSelected()){
             genero = "Femenino";
-        }
+        }else
         if (rbHombre.isSelected()){
             genero = "Masculino";
+        }else{
+            genero = "";
         }
         return genero;
     }
@@ -344,6 +301,15 @@ public class GUIRegistrarDatosConductor extends javax.swing.JInternalFrame imple
 
     @Override
     public void actualizar(AModel amodel) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    
+    }
+    public boolean camposNulos (){
+        
+        if(txbNombreConductor.getText().isEmpty() || txbNombreConductor.getText().isEmpty() || 
+                tbxapellidoConductor.getText().isEmpty() || getGenero().equals("")){
+            Utilidades.Utilidades.mensajeError("FALTA LLENAR CAMPOS PARA PODER HACER EL REGISTRO EXITOSO", "CAMPOS NULOS");
+            return true;
+        }
+        return false;
     }
 }

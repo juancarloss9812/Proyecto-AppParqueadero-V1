@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="239d7be4-a3a3-4304-8cb2-84389b85505c">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[SELECT 
+  CONCAT( EXTRACT(HOUR FROM ingfechaingreso), ' to ', CONCAT( extract (HOUR from ingfechaingreso), ':59:59' ) ) as hora,
+  COUNT(*) as numIngresos
+FROM 
+  ingreso
+GROUP BY 
+  DATE(ingfechaingreso), 
+  extract (HOUR from ingfechaingreso)
+ORDER BY
+  DATE (ingfechaingreso), 
+  extract (HOUR from ingfechaingreso)]]>
+	</queryString>
+	<field name="hora" class="java.lang.String"/>
+	<field name="numingresos" class="java.lang.Long"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<staticText>
+				<reportElement x="80" y="0" width="410" height="79" uuid="2fac498e-6e18-4eb1-8a04-b00577d73a5b"/>
+				<textElement textAlignment="Center">
+					<font fontName="Franklin Gothic Demi" size="24"/>
+				</textElement>
+				<text><![CDATA[Reporte de ingreso por horas del Parqueadero UNICAUCA]]></text>
+			</staticText>
+		</band>
+	</title>
+	<summary>
+		<band height="287" splitType="Stretch">
+			<barChart>
+				<chart isShowLegend="false">
+					<reportElement x="0" y="0" width="555" height="287" uuid="04921666-9bb8-4bd4-bf68-819e8eefd603"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<categoryDataset>
+					<categorySeries>
+						<seriesExpression><![CDATA[$F{hora}]]></seriesExpression>
+						<categoryExpression><![CDATA[$F{hora}]]></categoryExpression>
+						<valueExpression><![CDATA[$F{numingresos}]]></valueExpression>
+					</categorySeries>
+				</categoryDataset>
+				<barPlot>
+					<plot/>
+					<itemLabel/>
+					<categoryAxisFormat>
+						<axisFormat/>
+					</categoryAxisFormat>
+					<valueAxisFormat>
+						<axisFormat/>
+					</valueAxisFormat>
+				</barPlot>
+			</barChart>
+		</band>
+	</summary>
+</jasperReport>

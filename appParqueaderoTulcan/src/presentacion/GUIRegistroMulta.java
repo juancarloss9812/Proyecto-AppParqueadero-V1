@@ -6,9 +6,16 @@
 package presentacion;
 
 import java.awt.Image;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import negocio.GestorMulta;
+import negocio.GestorVehiculo;
+import negocio.GestorVehiculoPersona;
+import negocio.Vehiculo;
+import negocio.multa;
 
 /**
  *
@@ -21,6 +28,9 @@ public class GUIRegistroMulta extends javax.swing.JInternalFrame {
      */
     String ruta = null;
     Icon icono;
+    private final GestorMulta gestorMulta = new GestorMulta();
+    private final GestorVehiculoPersona gestorUsuario = new GestorVehiculoPersona();
+
     /**
      * Creates new form GUIMultas
      */
@@ -65,7 +75,7 @@ public class GUIRegistroMulta extends javax.swing.JInternalFrame {
         lblDescripcion.setForeground(new java.awt.Color(255, 255, 255));
         lblDescripcion.setText("DESCRIPCION : ");
 
-        cbxDescripcion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "CONDUCTOR SE ESTACIONO EN UNA BAIA, LA CUAL NO LE CORRESPONDE", "CONDUCTOR SE ESTACIONO DE MANERA INCORRECTO", " " }));
+        cbxDescripcion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "CONDUCTOR SE ESTACIONO EN UNA BAIA LA CUAL NO LE CORRESPONDE", "CONDUCTOR SE ESTACIONO DE MANERA INCORRECTO" }));
         cbxDescripcion.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cbxDescripcionActionPerformed(evt);
@@ -86,6 +96,11 @@ public class GUIRegistroMulta extends javax.swing.JInternalFrame {
         lblFoto.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
 
         btnguardar.setText("GUARDAR MULTA");
+        btnguardar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnguardarActionPerformed(evt);
+            }
+        });
 
         lblUrl.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
 
@@ -108,7 +123,7 @@ public class GUIRegistroMulta extends javax.swing.JInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel1))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(99, Short.MAX_VALUE)
+                .addContainerGap(103, Short.MAX_VALUE)
                 .addComponent(cbxDescripcion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(48, 48, 48))
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -137,7 +152,7 @@ public class GUIRegistroMulta extends javax.swing.JInternalFrame {
                 .addGap(50, 50, 50)
                 .addComponent(lblFoto, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnguardar)
                     .addComponent(lblUrl, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(28, Short.MAX_VALUE))
@@ -177,6 +192,29 @@ public class GUIRegistroMulta extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_cbxDescripcionActionPerformed
 
+    private void btnguardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnguardarActionPerformed
+        if(!txbPlaca.getText().isEmpty()){
+            String varDescripcion = getDescripcion();
+            String varPlaca = getPlaca();
+            String fecha = getMulfecha();
+            String confirmacion;
+            String peridentificacion;
+            Vehiculo vehiculo = gestorUsuario.BuscarPlaca(varPlaca);
+
+         if(vehiculo == null){
+             Utilidades.Utilidades.mensajeError("ERROR", "La placa no se encuentra registrado a ningun usuario");
+         }else{
+             //le paso el ide del conductor que tiene la multa
+             peridentificacion=vehiculo.getPerIdentificacion();
+             multa objMulta = new multa(varPlaca, varDescripcion, fecha, ruta,peridentificacion);
+             confirmacion = gestorMulta.registrarMulta(objMulta);
+             Utilidades.Utilidades.mensajeExito(confirmacion, "Registro Exitoso.");
+         }
+        }else{
+            Utilidades.Utilidades.mensajeError("FALTA LLENAR CAMPOS PARA PODER HACER EL REGISTRO EXITOSO", "CAMPOS NULOS");
+        }
+    }//GEN-LAST:event_btnguardarActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAbrir;
@@ -191,4 +229,32 @@ public class GUIRegistroMulta extends javax.swing.JInternalFrame {
     private javax.swing.JLabel lblUrl;
     private javax.swing.JTextField txbPlaca;
     // End of variables declaration//GEN-END:variables
+        
+    public String getPlaca(){
+        String varPlaca= "";
+        varPlaca= txbPlaca.getText();
+        System.out.println(varPlaca);
+        return varPlaca;
+    }
+    
+    public String getDescripcion(){
+        int i;
+        String varTipoDescripcion = "";
+        if (cbxDescripcion.getSelectedIndex() == 0){
+            varTipoDescripcion = "CONDUCTOR SE ESTACIONO EN UNA BAIA NO INCORRECTA";
+        }
+        if(cbxDescripcion.getSelectedIndex() == 1){
+            varTipoDescripcion = "CONDUCTOR SE ESTACIONO DE MANERA INCORRECTO";
+        }
+        
+        return varTipoDescripcion;
+    }
+        public String getMulfecha() {
+        Date now = new Date(System.currentTimeMillis());
+        SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat hour = new SimpleDateFormat("HH:mm:ss");
+        String fechaHora= date.format(now)+" "+hour.format(now) ;
+        System.out.println(fechaHora);
+        return fechaHora;
+    }
 }

@@ -13,12 +13,21 @@ public class conectorJDBC {
     private ResultSet resultado;
     private Statement estamento;
 
-    private final String url = "jdbc:postgresql://localhost:5432/postgres";
+    private final String url = "jdbc:postgresql://localhost:5432/proyectoParqueadero";
     private final String usuario = "postgres";
     private final String contrasenia = "system";
-
-    public conectorJDBC() {
+    private static conectorJDBC instance;
+    
+    private conectorJDBC(){}
+    
+    public static conectorJDBC getInstance(){
+        if(instance == null){
+            instance = new conectorJDBC();
+        }
+        return instance;
     }
+    //public conectorJDBC() {
+    //}
 
     /* Se conecta a la base de datos de java
      * @throws ClassNotFoundException

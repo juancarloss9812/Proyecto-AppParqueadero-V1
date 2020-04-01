@@ -1,11 +1,25 @@
 package presentacion;
-
+import Utilidades.imgen_Escritorio;
 import Utilidades.Utilidades;
 import java.beans.PropertyVetoException;
+import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
+import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
+import main.RunMVC;
 import mvcf.AModel;
 import mvcf.AView;
+import negocio.GestorBahia;
+import negocio.ReporteCongestion;
+import negocio.conector;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.util.JRLoader;
+import net.sf.jasperreports.view.JasperViewer;
 
 public class GUIInicio extends javax.swing.JFrame implements AView{
 
@@ -13,9 +27,12 @@ public class GUIInicio extends javax.swing.JFrame implements AView{
      * Creates new form GUIInicio
      */
     public GUIInicio() {
-       
+         this.setIconImage(new ImageIcon(getClass().getResource("/imagenes/carro.png")).getImage());
+         this.setTitle("APLICACION PARQUEADERO CDU UNICAUCA");
         Utilidades.mensajeExito("Bienvenido", "Inicio Exitoso");
+        //dskEscritorio.setBorder(new imgen_Escritorio());
         initComponents();
+
     }
 
     /**
@@ -27,11 +44,17 @@ public class GUIInicio extends javax.swing.JFrame implements AView{
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jMenuItem1 = new javax.swing.JMenuItem();
         dskEscritorio = new javax.swing.JDesktopPane();
         jMenuBar2 = new javax.swing.JMenuBar();
         mnuOpciones = new javax.swing.JMenu();
         mnuRegIngreso = new javax.swing.JMenuItem();
         mnuRegMulta = new javax.swing.JMenuItem();
+        jMenuItem3 = new javax.swing.JMenuItem();
+        jMenuItem4 = new javax.swing.JMenuItem();
+        jMenuItem2 = new javax.swing.JMenuItem();
+
+        jMenuItem1.setText("jMenuItem1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -51,6 +74,7 @@ public class GUIInicio extends javax.swing.JFrame implements AView{
 
         mnuOpciones.setText("Opciones");
 
+        mnuRegIngreso.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/search_icon-icons.com_54424.png"))); // NOI18N
         mnuRegIngreso.setText("Buscar Conductor");
         mnuRegIngreso.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -59,6 +83,7 @@ public class GUIInicio extends javax.swing.JFrame implements AView{
         });
         mnuOpciones.add(mnuRegIngreso);
 
+        mnuRegMulta.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/1477521607_halloween_outline-02_icon-icons.com_74588.png"))); // NOI18N
         mnuRegMulta.setText("Registrar Multa");
         mnuRegMulta.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -66,6 +91,33 @@ public class GUIInicio extends javax.swing.JFrame implements AView{
             }
         });
         mnuOpciones.add(mnuRegMulta);
+
+        jMenuItem3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/map_search_find_maps_10803.png"))); // NOI18N
+        jMenuItem3.setText("Ver Mapa");
+        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem3ActionPerformed(evt);
+            }
+        });
+        mnuOpciones.add(jMenuItem3);
+
+        jMenuItem4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/bar_chart_21471.png"))); // NOI18N
+        jMenuItem4.setText("Reporte de Congestion");
+        jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem4ActionPerformed(evt);
+            }
+        });
+        mnuOpciones.add(jMenuItem4);
+
+        jMenuItem2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/log_logout_door_1563.png"))); // NOI18N
+        jMenuItem2.setText("Cerrar seccion");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        mnuOpciones.add(jMenuItem2);
 
         jMenuBar2.add(mnuOpciones);
 
@@ -79,9 +131,7 @@ public class GUIInicio extends javax.swing.JFrame implements AView{
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(dskEscritorio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(dskEscritorio)
         );
 
         pack();
@@ -108,10 +158,67 @@ public class GUIInicio extends javax.swing.JFrame implements AView{
         // TODO add your handling code here:
     }//GEN-LAST:event_mnuRegMultaActionPerformed
 
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        // TODO add your handling code here:
+        setVisible(false);
+        setVisible(false);
+        RunMVC objRun = new RunMVC();
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+        // TODO add your handling code here:
+         GUIMapaParqueadero mapa = null;
+        try {
+            mapa = new GUIMapaParqueadero();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(GUIInicio.class.getName()).log(Level.SEVERE, null, ex);
+        }
+         mapa.verMapa();
+         mapa.setLocation(720, 0);
+         mapa.setVisible(true);
+   
+    }//GEN-LAST:event_jMenuItem3ActionPerformed
+
+    private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
+        // TODO add your handling code here:
+                GestorBahia objParqueadero = new GestorBahia();
+        ArrayList<ReporteCongestion> listaReportes = null;
+        try {
+            listaReportes = objParqueadero.reporteIngreso();
+            if (!listaReportes.equals("No se encontro reportes.")) {
+                conector con = new conector();
+                Connection conn = con.getConecion();
+                try {
+                    JasperReport reporte;
+                    //C:\Users\HP\Desktop\appProyectoFinal\appParqueaderoTulcan\src\Reporte\ReporteCongestion.jasper
+                    String path = "C:\\Users\\HP\\Desktop\\appProyectoFinal\\appParqueaderoTulcan\\src\\Reporte\\ReporteCongestion.jasper";
+                    reporte = (JasperReport) JRLoader.loadObjectFromFile(path); //Se carga el reporte de su localizacion
+                    JasperPrint jprint = JasperFillManager.fillReport(reporte, null, conn); //Agregamos los parametros para llenar el reporte
+                    JasperViewer viewer = new JasperViewer(jprint, false); //Se crea la vista del reportes
+                    viewer.setDefaultCloseOperation(DISPOSE_ON_CLOSE); // Se declara con dispose_on_close para que no se cierre el programa cuando se cierre el reporte
+                    viewer.setVisible(true); //Se vizualiza el reporte
+
+                } catch (JRException ex) {
+                    Logger.getLogger(GUIInicio.class.getName()).log(Level.SEVERE, null, ex);
+                    Utilidades.mensajeError(ex.getMessage(), "Error");
+                }
+            } else {
+                Utilidades.mensajeError("No existen datos", "Error");
+            }
+        } catch (Exception ex) {
+            Utilidades.mensajeError(ex.getMessage(), "Error");
+        }
+
+    }//GEN-LAST:event_jMenuItem4ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public static javax.swing.JDesktopPane dskEscritorio;
     private javax.swing.JMenuBar jMenuBar2;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenu mnuOpciones;
     private javax.swing.JMenuItem mnuRegIngreso;
     private javax.swing.JMenuItem mnuRegMulta;

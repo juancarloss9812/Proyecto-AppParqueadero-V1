@@ -6,17 +6,20 @@ import mvcf.AActionController;
 import mvcf.AModel;
 import mvcf.AView;
 import negocio.GestorUsuario;
-import negocio.Vigilante;
+import negocio.GestorVehiculoPersona;
+import negocio.usuario;
 
 public class GUIAutenticacionController extends AActionController {
 
     private final GestorUsuario gestor;
+    private final GestorVehiculoPersona gestorUsuario;
     private final GUIAutenticacion vista;
 
     public GUIAutenticacionController(AModel myModel, AView myView) {
         super(myModel, myView);
         this.vista = (GUIAutenticacion) myView;
         this.gestor = (GestorUsuario) myModel;
+        this.gestorUsuario = new GestorVehiculoPersona();
     }
 
     @Override
@@ -33,22 +36,59 @@ public class GUIAutenticacionController extends AActionController {
     private void iniciarSesion() {
         String usuario = vista.getUsuario();
         String contraseña = vista.getContraseña();
-        Vigilante objUsuario = gestor.Iniciar_Sesion(usuario);
-        if (objUsuario != null && objUsuario.getVigUsuario().equals(usuario) && objUsuario.getVigContrasenia().equals(contraseña)) {
-            java.awt.EventQueue.invokeLater(new Runnable() {
+        usuario objUsuario = gestorUsuario.BuscarUsuario(usuario);
+        String rol = objUsuario.getRol();
+        System.out.println(rol);
+        String texto;
+        if (objUsuario != null && objUsuario.getUsuusuario().equals(usuario) && objUsuario.getUsucontraseña().equals(contraseña)) {
+            texto =objUsuario.getUsunombre()+" "+objUsuario.getUsuapellido();
+            
+            if(rol.equals("VIGILANTE")){
+                java.awt.EventQueue.invokeLater(new Runnable() {
                 @Override
-                public void run() {
-                    GUIInicio objInicio = new GUIInicio();
-                    objInicio.setVisible(true);
-                    
-                    GUIMapaParqueadero objMapa= new GUIMapaParqueadero();
-                    objMapa.setLocation(720, 0);
-                    objMapa.setVisible(true);
+                    public void run() {
+                        GUIInicio objInicio = new GUIInicio();
+                        objInicio.setVisible(true);
+
+                        vista.setVisible(false);
+                       
+                    }
+                });
+            }else 
+                if(rol.equals("ADMINISTRATIVO")){
+                   {
+                    java.awt.EventQueue.invokeLater(new Runnable() {
+                    @Override
+                        public void run() {
+                            System.out.println(texto);
+                            GUIVistaAdministrador objVistaAdm = new GUIVistaAdministrador(texto);
+
+                            objVistaAdm.setVisible(true);
+                            //GUIMapaParqueadero objMapa= new GUIMapaParqueadero();
+                            vista.setVisible(false);
+                            //objMapa.setLocation(720, 0);
+                            //objMapa.setVisible(true);
+                        }
+                    });
                 }
-            });
-        } else {
-            Utilidades.mensajeAdvertencia("Contraseña incorrecta", "Atencion");
+            }else {
+                    java.awt.EventQueue.invokeLater(new Runnable() {
+                    @Override
+                        public void run() {
+                            System.out.println(texto);
+                            GUIvistaUsuario objVista = new GUIvistaUsuario(texto);
+
+                            objVista.setVisible(true);
+                            //GUIMapaParqueadero objMapa= new GUIMapaParqueadero();
+                            vista.setVisible(false);
+                            //objMapa.setLocation(720, 0);
+                            //objMapa.setVisible(true);
+                        }
+                    });
+            }
+    }else{
+           Utilidades.mensajeError("Usuario o Contraseña incorrecta, porfavor vuelva a intentar", "Fallo en iniciar seccion");
         }
-    }
+    
 }
-///listend
+}

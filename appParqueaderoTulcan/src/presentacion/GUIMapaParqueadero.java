@@ -5,20 +5,32 @@
  */
 package presentacion;
 
+import Utilidades.Utilidades;
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import mvcf.AModel;
-import mvcf.AView;
+import java.util.Date;
+import java.util.concurrent.Semaphore;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import negocio.GestorBahia;
+import negocio.bahia;
 
 /**
  *
  * @author JUAN
  */
-public class GUIMapaParqueadero extends javax.swing.JFrame implements AView{ 
-   
+public class GUIMapaParqueadero extends javax.swing.JFrame implements ActionListener{ 
+    private String placa;
     private String tipoEstado;
-    
+    private String puesto;
     private String accion;
+    GUIReporteIngreso objReporte= null;
+    private String artIdentificacion;
+    private final GestorBahia gestor = new GestorBahia();
+    private Semaphore semaphore = new Semaphore(1);
     //estado 
     //    0=comienzo y no puede modificar los puestos 
     //    1=selecciono el estado entrada y solo puede seleccionar uno de los botones si esta disponible
@@ -26,54 +38,52 @@ public class GUIMapaParqueadero extends javax.swing.JFrame implements AView{
     //    3=que ya se selcciono uno y no se puede poner otro solo si se desmarca
     private static int estado = 0;
     private ArrayList<javax.swing.JButton> listabt;
-   
-    public GUIMapaParqueadero() {
-        initComponents();
-        listabt=new ArrayList<javax.swing.JButton> ();
-        btnguardar.setEnabled(false);
-        //TODO aqui tenes que cargar los datos que si esten en el parqueadero
-        //esto se hace cuando se comienza el progrma por eso se pone asi
-        btnZonaD.setBackground(Color.WHITE);
-        btnZonaD1.setBackground(Color.WHITE);
-        btnZonaD2.setBackground(Color.WHITE);
-        btnZonaD3.setBackground(Color.WHITE);
-        btnZonaD4.setBackground(Color.WHITE);
-        btnZonaD5.setBackground(Color.WHITE);
-        btnZonaA.setBackground(Color.WHITE);
-        btnZonaA1.setBackground(Color.WHITE);
-        btnZonaA2.setBackground(Color.WHITE);
-        btnZonaA3.setBackground(Color.WHITE);
-        btnZonaA4.setBackground(Color.WHITE);
-        btnZonaA5.setBackground(Color.WHITE);
-        btnZonaC1.setBackground(Color.WHITE);
-        btnZonaC2.setBackground(Color.WHITE);
-        btnZonaC3.setBackground(Color.WHITE);
-        btnZonaC4.setBackground(Color.WHITE);
-        btnZonaC5.setBackground(Color.WHITE);
-        btnZonaC6.setBackground(Color.WHITE);
-        btnZonaC7.setBackground(Color.WHITE);
-        btnZonaC8.setBackground(Color.WHITE);
-        btnZonaC9.setBackground(Color.WHITE);
-        btnZonaC10.setBackground(Color.WHITE);
-        btnZonaC11.setBackground(Color.WHITE);
-        btnZonaC12.setBackground(Color.WHITE);
-        btnZonaB1.setBackground(Color.WHITE);
-        btnZonaB2.setBackground(Color.WHITE);
-        btnZonaB3.setBackground(Color.WHITE);
-        btnZonaB4.setBackground(Color.WHITE);
-        btnZonaB5.setBackground(Color.WHITE);
-        btnZonaB6.setBackground(Color.WHITE);
-        btnZonaB7.setBackground(Color.WHITE);
-        btnZonaB8.setBackground(Color.WHITE);
-        btnZonaB9.setBackground(Color.WHITE);
-        btnZonaB10.setBackground(Color.WHITE);
-        btnZonaB11.setBackground(Color.WHITE);
-        btnZonaB12.setBackground(Color.WHITE);
-        btnZonaB13.setBackground(Color.WHITE);
-        btnZonaB14.setBackground(Color.WHITE);
-        btnZonaB15.setBackground(Color.WHITE);
-        
-    }
+   /*
+    Thread t1 = new Thread(){
+        @Override
+            public void run(){
+                int segundos = 0;
+                try {
+                    while(true){
+                        System.out.println("Segundos: " + segundos);
+                        Thread.sleep(1000);
+                        segundos++;
+                        if (segundos >= 3 ) {
+                            cargarpuestos();
+                            System.out.println("Mapa Recargado");
+                            segundos = 0;
+                        }
+                    }   
+                }catch(Exception e){
+                    System.out.println("Se salio Exception");
+                }
+                System.out.println("Se salio del hilo while");
+                segundos = 0;
+                run();
+            }
+        };
+    */ 
+    public GUIMapaParqueadero() throws InterruptedException {
+            initComponents();
+            listabt=new ArrayList<javax.swing.JButton> ();
+            agregarLisent();
+            llenarListaBotones();
+            cargarpuestos();       
+            btnguardar.setEnabled(false);
+       //     t1.start();
+        }
+
+        public GUIMapaParqueadero(ArrayList<String> placas,String prmIdentificacion) throws InterruptedException {
+            initComponents();
+            llenarCombox(placas);
+            artIdentificacion =prmIdentificacion;
+            System.out.println(artIdentificacion);
+            listabt=new ArrayList<javax.swing.JButton> ();
+            agregarLisent();
+            llenarListaBotones();
+            cargarpuestos();       
+            btnguardar.setEnabled(false);
+        }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -141,15 +151,16 @@ public class GUIMapaParqueadero extends javax.swing.JFrame implements AView{
         btnZonaA5 = new javax.swing.JButton();
         jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
-        jPanel5 = new javax.swing.JPanel();
+        pnlDatos = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         cbxVehiculo = new javax.swing.JComboBox<>();
         cbxSalidaEntrada = new javax.swing.JComboBox<>();
         btnSelccionado = new javax.swing.JButton();
         btnguardar = new javax.swing.JButton();
+        btnCerrar = new java.awt.Button();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         jLabel1.setText("                              RESIDENCIAS");
         jLabel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -218,77 +229,29 @@ public class GUIMapaParqueadero extends javax.swing.JFrame implements AView{
 
         jPanel6.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
-        btnZonaC1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaC1ActionPerformed(evt);
-            }
-        });
+        btnZonaC1.setText("1C");
 
-        btnZonaC2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaC2ActionPerformed(evt);
-            }
-        });
+        btnZonaC2.setText("2C");
 
-        btnZonaC3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaC3ActionPerformed(evt);
-            }
-        });
+        btnZonaC3.setText("3C");
 
-        btnZonaC4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaC4ActionPerformed(evt);
-            }
-        });
+        btnZonaC4.setText("4C");
 
-        btnZonaC5.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaC5ActionPerformed(evt);
-            }
-        });
+        btnZonaC5.setText("5C");
 
-        btnZonaC6.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaC6ActionPerformed(evt);
-            }
-        });
+        btnZonaC6.setText("6C");
 
-        btnZonaC7.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaC7ActionPerformed(evt);
-            }
-        });
+        btnZonaC7.setText("7C");
 
-        btnZonaC9.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaC9ActionPerformed(evt);
-            }
-        });
+        btnZonaC9.setText("9C");
 
-        btnZonaC11.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaC11ActionPerformed(evt);
-            }
-        });
+        btnZonaC11.setText("11C");
 
-        btnZonaC8.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaC8ActionPerformed(evt);
-            }
-        });
+        btnZonaC8.setText("8C");
 
-        btnZonaC10.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaC10ActionPerformed(evt);
-            }
-        });
+        btnZonaC10.setText("10C");
 
-        btnZonaC12.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaC12ActionPerformed(evt);
-            }
-        });
+        btnZonaC12.setText("12C");
 
         jLabel7.setText("Zona C");
 
@@ -313,12 +276,11 @@ public class GUIMapaParqueadero extends javax.swing.JFrame implements AView{
                                 .addComponent(btnZonaC10, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnZonaC11, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnZonaC9, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnZonaC12, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnZonaC6, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(btnZonaC6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnZonaC9, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnZonaC12, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel6Layout.createSequentialGroup()
                         .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jLabel7)
@@ -360,95 +322,35 @@ public class GUIMapaParqueadero extends javax.swing.JFrame implements AView{
 
         jPanel7.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
-        btnZonaB1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaB1ActionPerformed(evt);
-            }
-        });
+        btnZonaB1.setText("1B");
 
-        btnZonaB2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaB2ActionPerformed(evt);
-            }
-        });
+        btnZonaB2.setText("2B");
 
-        btnZonaB3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaB3ActionPerformed(evt);
-            }
-        });
+        btnZonaB3.setText("3B");
 
-        btnZonaB4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaB4ActionPerformed(evt);
-            }
-        });
+        btnZonaB4.setText("4B");
 
-        btnZonaB5.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaB5ActionPerformed(evt);
-            }
-        });
+        btnZonaB5.setText("5B");
 
-        btnZonaB6.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaB6ActionPerformed(evt);
-            }
-        });
+        btnZonaB6.setText("6B");
 
-        btnZonaB7.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaB7ActionPerformed(evt);
-            }
-        });
+        btnZonaB7.setText("7B");
 
-        btnZonaB8.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaB8ActionPerformed(evt);
-            }
-        });
+        btnZonaB8.setText("8B");
 
-        btnZonaB9.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaB9ActionPerformed(evt);
-            }
-        });
+        btnZonaB9.setText("9B");
 
-        btnZonaB10.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaB10ActionPerformed(evt);
-            }
-        });
+        btnZonaB10.setText("10B");
 
-        btnZonaB11.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaB11ActionPerformed(evt);
-            }
-        });
+        btnZonaB11.setText("11B");
 
-        btnZonaB12.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaB12ActionPerformed(evt);
-            }
-        });
+        btnZonaB12.setText("12B");
 
-        btnZonaB13.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaB13ActionPerformed(evt);
-            }
-        });
+        btnZonaB13.setText("13B");
 
-        btnZonaB14.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaB14ActionPerformed(evt);
-            }
-        });
+        btnZonaB14.setText("14B");
 
-        btnZonaB15.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaB15ActionPerformed(evt);
-            }
-        });
+        btnZonaB15.setText("15B");
 
         jLabel8.setText("Zona B");
 
@@ -461,25 +363,25 @@ public class GUIMapaParqueadero extends javax.swing.JFrame implements AView{
                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel7Layout.createSequentialGroup()
                         .addComponent(btnZonaB4, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnZonaB5, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnZonaB6, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel7Layout.createSequentialGroup()
                         .addComponent(btnZonaB7, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnZonaB8, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnZonaB9, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel7Layout.createSequentialGroup()
                         .addComponent(btnZonaB10, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnZonaB11, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnZonaB12, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel7Layout.createSequentialGroup()
                         .addComponent(btnZonaB13, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnZonaB14, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnZonaB15, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -492,7 +394,7 @@ public class GUIMapaParqueadero extends javax.swing.JFrame implements AView{
                                 .addComponent(btnZonaB2, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnZonaB3, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(22, Short.MAX_VALUE))
         );
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -529,41 +431,17 @@ public class GUIMapaParqueadero extends javax.swing.JFrame implements AView{
 
         jPanel8.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
-        btnZonaD.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaDActionPerformed(evt);
-            }
-        });
+        btnZonaD.setText("1D");
 
-        btnZonaD1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaD1ActionPerformed(evt);
-            }
-        });
+        btnZonaD1.setText("2D");
 
-        btnZonaD2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaD2ActionPerformed(evt);
-            }
-        });
+        btnZonaD2.setText("3D");
 
-        btnZonaD3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaD3ActionPerformed(evt);
-            }
-        });
+        btnZonaD3.setText("4D");
 
-        btnZonaD4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaD4ActionPerformed(evt);
-            }
-        });
+        btnZonaD4.setText("6D");
 
-        btnZonaD5.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaD5ActionPerformed(evt);
-            }
-        });
+        btnZonaD5.setText("5D");
 
         jLabel9.setText("Zona D");
 
@@ -573,12 +451,12 @@ public class GUIMapaParqueadero extends javax.swing.JFrame implements AView{
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel8Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel8Layout.createSequentialGroup()
                         .addComponent(btnZonaD3, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnZonaD5, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnZonaD4, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel8Layout.createSequentialGroup()
                         .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -589,7 +467,7 @@ public class GUIMapaParqueadero extends javax.swing.JFrame implements AView{
                             .addComponent(jLabel9, javax.swing.GroupLayout.Alignment.TRAILING))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnZonaD2, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(4, 4, 4))
+                .addGap(11, 11, 11))
         );
         jPanel8Layout.setVerticalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -611,41 +489,17 @@ public class GUIMapaParqueadero extends javax.swing.JFrame implements AView{
 
         jPanel9.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
-        btnZonaA.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaAActionPerformed(evt);
-            }
-        });
+        btnZonaA.setText("1A");
 
-        btnZonaA1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaA1ActionPerformed(evt);
-            }
-        });
+        btnZonaA1.setText("2A");
 
-        btnZonaA2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaA2ActionPerformed(evt);
-            }
-        });
+        btnZonaA2.setText("3A");
 
-        btnZonaA3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaA3ActionPerformed(evt);
-            }
-        });
+        btnZonaA3.setText("4A");
 
-        btnZonaA4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaA4ActionPerformed(evt);
-            }
-        });
+        btnZonaA4.setText("6A");
 
-        btnZonaA5.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZonaA5ActionPerformed(evt);
-            }
-        });
+        btnZonaA5.setText("5A");
 
         jLabel10.setText("Zona A");
 
@@ -667,7 +521,7 @@ public class GUIMapaParqueadero extends javax.swing.JFrame implements AView{
                             .addComponent(jLabel10)))
                     .addGroup(jPanel9Layout.createSequentialGroup()
                         .addComponent(btnZonaA3, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGap(11, 11, 11)
                         .addComponent(btnZonaA5, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnZonaA4, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -711,11 +565,11 @@ public class GUIMapaParqueadero extends javax.swing.JFrame implements AView{
                 .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGap(167, 167, 167)
-                        .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel4Layout.createSequentialGroup()
                         .addGap(40, 40, 40)
-                        .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGap(156, 156, 156)
+                        .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(28, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
@@ -740,7 +594,7 @@ public class GUIMapaParqueadero extends javax.swing.JFrame implements AView{
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
 
-        jPanel5.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        pnlDatos.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         jLabel5.setText("TIPO DE VEHICULO:");
 
@@ -755,19 +609,19 @@ public class GUIMapaParqueadero extends javax.swing.JFrame implements AView{
             }
         });
 
-        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
+        javax.swing.GroupLayout pnlDatosLayout = new javax.swing.GroupLayout(pnlDatos);
+        pnlDatos.setLayout(pnlDatosLayout);
+        pnlDatosLayout.setHorizontalGroup(
+            pnlDatosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlDatosLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGroup(pnlDatosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlDatosLayout.createSequentialGroup()
                         .addComponent(jLabel5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(cbxVehiculo, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap(102, Short.MAX_VALUE))
-                    .addGroup(jPanel5Layout.createSequentialGroup()
+                    .addGroup(pnlDatosLayout.createSequentialGroup()
                         .addComponent(jLabel6)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(cbxSalidaEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -775,15 +629,15 @@ public class GUIMapaParqueadero extends javax.swing.JFrame implements AView{
                         .addComponent(btnSelccionado)
                         .addGap(38, 38, 38))))
         );
-        jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
+        pnlDatosLayout.setVerticalGroup(
+            pnlDatosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlDatosLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(pnlDatosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
                     .addComponent(cbxVehiculo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(pnlDatosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
                     .addComponent(cbxSalidaEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnSelccionado))
@@ -797,6 +651,14 @@ public class GUIMapaParqueadero extends javax.swing.JFrame implements AView{
             }
         });
 
+        btnCerrar.setActionCommand("CERRAR");
+        btnCerrar.setLabel("CERRAR");
+        btnCerrar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCerrarActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -806,24 +668,28 @@ public class GUIMapaParqueadero extends javax.swing.JFrame implements AView{
                     .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(16, 16, 16)
-                        .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(pnlDatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnguardar)))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(btnguardar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnCerrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(163, 163, 163)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 242, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(21, Short.MAX_VALUE))
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(163, 163, 163)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 242, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(pnlDatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(btnguardar)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addComponent(btnguardar)
+                            .addGap(18, 18, 18)
+                            .addComponent(btnCerrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -848,855 +714,97 @@ public class GUIMapaParqueadero extends javax.swing.JFrame implements AView{
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnZonaAActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaAActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaA.getBackground().equals(Color.WHITE)) {
-                    btnZonaA.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaA.getBackground().equals(Color.GREEN)){
-                    btnZonaA.setBackground(Color.WHITE);
-                    estado=3;    
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-        
-    }//GEN-LAST:event_btnZonaAActionPerformed
-
-    private void btnZonaA1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaA1ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaA1.getBackground().equals(Color.WHITE)) {
-                    btnZonaA1.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaA1.getBackground().equals(Color.GREEN)){
-                    btnZonaA1.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-                btnguardar.setEnabled(true);
-
-    }//GEN-LAST:event_btnZonaA1ActionPerformed
-
-    private void btnZonaA2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaA2ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaA2.getBackground().equals(Color.WHITE)) {
-                    btnZonaA2.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaA2.getBackground().equals(Color.GREEN)){
-                    btnZonaA2.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-    }//GEN-LAST:event_btnZonaA2ActionPerformed
-
-    private void btnZonaA3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaA3ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaA3.getBackground().equals(Color.WHITE)) {
-                    btnZonaA3.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaA3.getBackground().equals(Color.GREEN)){
-                    btnZonaA3.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-                btnguardar.enable(true);
-
-    }//GEN-LAST:event_btnZonaA3ActionPerformed
-
-    private void btnZonaA4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaA4ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaA4.getBackground().equals(Color.WHITE)) {
-                    btnZonaA4.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaA4.getBackground().equals(Color.GREEN)){
-                    btnZonaA4.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-
-    }//GEN-LAST:event_btnZonaA4ActionPerformed
-
-    private void btnZonaA5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaA5ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaA5.getBackground().equals(Color.WHITE)) {
-                    btnZonaA5.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaA5.getBackground().equals(Color.GREEN)){
-                    btnZonaA5.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-
-    }//GEN-LAST:event_btnZonaA5ActionPerformed
-
-    private void btnZonaDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaDActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaD.getBackground().equals(Color.WHITE)) {
-                    btnZonaD.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaD.getBackground().equals(Color.GREEN)){
-                    btnZonaD.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-
-    }//GEN-LAST:event_btnZonaDActionPerformed
-
-    private void btnZonaD1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaD1ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaD1.getBackground().equals(Color.WHITE)) {
-                    btnZonaD1.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaD1.getBackground().equals(Color.GREEN)){
-                    btnZonaD1.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-
-    }//GEN-LAST:event_btnZonaD1ActionPerformed
-
-    private void btnZonaD2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaD2ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaD2.getBackground().equals(Color.WHITE)) {
-                    btnZonaD2.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaD2.getBackground().equals(Color.GREEN)){
-                    btnZonaD2.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-
-    }//GEN-LAST:event_btnZonaD2ActionPerformed
-
-    private void btnZonaD3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaD3ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaD3.getBackground().equals(Color.WHITE)) {
-                    btnZonaD3.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaD3.getBackground().equals(Color.GREEN)){
-                    btnZonaD3.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-
-    }//GEN-LAST:event_btnZonaD3ActionPerformed
-
-    private void btnZonaD5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaD5ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaD5.getBackground().equals(Color.WHITE)) {
-                    btnZonaD5.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaD5.getBackground().equals(Color.GREEN)){
-                    btnZonaD5.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-
-    }//GEN-LAST:event_btnZonaD5ActionPerformed
-
-    private void btnZonaD4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaD4ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaD4.getBackground().equals(Color.WHITE)) {
-                    btnZonaD4.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaD4.getBackground().equals(Color.GREEN)){
-                    btnZonaD4.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-    }//GEN-LAST:event_btnZonaD4ActionPerformed
-
-    private void btnZonaC1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaC1ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaC1.getBackground().equals(Color.WHITE)) {
-                    btnZonaC1.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaC1.getBackground().equals(Color.GREEN)){
-                    btnZonaC1.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-    }//GEN-LAST:event_btnZonaC1ActionPerformed
-
-    private void btnZonaC2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaC2ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaC2.getBackground().equals(Color.WHITE)) {
-                    btnZonaC2.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaC2.getBackground().equals(Color.GREEN)){
-                    btnZonaC2.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-    }//GEN-LAST:event_btnZonaC2ActionPerformed
-
-    private void btnZonaC3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaC3ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaC3.getBackground().equals(Color.WHITE)) {
-                    btnZonaC3.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaC3.getBackground().equals(Color.GREEN)){
-                    btnZonaC3.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-    }//GEN-LAST:event_btnZonaC3ActionPerformed
-
-    private void btnZonaC4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaC4ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaC4.getBackground().equals(Color.WHITE)) {
-                    btnZonaC4.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaC4.getBackground().equals(Color.GREEN)){
-                    btnZonaC4.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-    }//GEN-LAST:event_btnZonaC4ActionPerformed
-
-    private void btnZonaC5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaC5ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaC5.getBackground().equals(Color.WHITE)) {
-                    btnZonaC5.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaC5.getBackground().equals(Color.GREEN)){
-                    btnZonaC5.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-    }//GEN-LAST:event_btnZonaC5ActionPerformed
-
-    private void btnZonaC6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaC6ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaC6.getBackground().equals(Color.WHITE)) {
-                    btnZonaC6.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaC6.getBackground().equals(Color.GREEN)){
-                    btnZonaC6.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-    }//GEN-LAST:event_btnZonaC6ActionPerformed
-
-    private void btnZonaC7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaC7ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaC7.getBackground().equals(Color.WHITE)) {
-                    btnZonaC7.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaC7.getBackground().equals(Color.GREEN)){
-                    btnZonaC7.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-    }//GEN-LAST:event_btnZonaC7ActionPerformed
-
-    private void btnZonaC8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaC8ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaC8.getBackground().equals(Color.WHITE)) {
-                    btnZonaC8.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaC8.getBackground().equals(Color.GREEN)){
-                    btnZonaC8.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-    }//GEN-LAST:event_btnZonaC8ActionPerformed
-
-    private void btnZonaC9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaC9ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaC9.getBackground().equals(Color.WHITE)) {
-                    btnZonaC9.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaC9.getBackground().equals(Color.GREEN)){
-                    btnZonaC9.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-    }//GEN-LAST:event_btnZonaC9ActionPerformed
-
-    private void btnZonaC10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaC10ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaC10.getBackground().equals(Color.WHITE)) {
-                    btnZonaC10.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaC10.getBackground().equals(Color.GREEN)){
-                    btnZonaC10.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-    }//GEN-LAST:event_btnZonaC10ActionPerformed
-
-    private void btnZonaC11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaC11ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaC11.getBackground().equals(Color.WHITE)) {
-                    btnZonaC11.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaC11.getBackground().equals(Color.GREEN)){
-                    btnZonaC11.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-    }//GEN-LAST:event_btnZonaC11ActionPerformed
-
-    private void btnZonaC12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaC12ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaC12.getBackground().equals(Color.WHITE)) {
-                    btnZonaC12.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaC12.getBackground().equals(Color.GREEN)){
-                    btnZonaC12.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-    }//GEN-LAST:event_btnZonaC12ActionPerformed
-
-    private void btnZonaB2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaB2ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaB2.getBackground().equals(Color.WHITE)) {
-                    btnZonaB2.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaB2.getBackground().equals(Color.GREEN)){
-                    btnZonaB2.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-    }//GEN-LAST:event_btnZonaB2ActionPerformed
-
-    private void btnZonaB1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaB1ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaB1.getBackground().equals(Color.WHITE)) {
-                    btnZonaB1.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaB1.getBackground().equals(Color.GREEN)){
-                    btnZonaB1.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-    }//GEN-LAST:event_btnZonaB1ActionPerformed
-
-    private void btnZonaB3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaB3ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaB3.getBackground().equals(Color.WHITE)) {
-                    btnZonaB3.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaB3.getBackground().equals(Color.GREEN)){
-                    btnZonaB3.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-    }//GEN-LAST:event_btnZonaB3ActionPerformed
-
-    private void btnZonaB4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaB4ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaB4.getBackground().equals(Color.WHITE)) {
-                    btnZonaB4.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaB4.getBackground().equals(Color.GREEN)){
-                    btnZonaB4.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-    }//GEN-LAST:event_btnZonaB4ActionPerformed
-
-    private void btnZonaB5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaB5ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaB5.getBackground().equals(Color.WHITE)) {
-                    btnZonaB5.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaB5.getBackground().equals(Color.GREEN)){
-                    btnZonaB5.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-    }//GEN-LAST:event_btnZonaB5ActionPerformed
-
-    private void btnZonaB6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaB6ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaB6.getBackground().equals(Color.WHITE)) {
-                    btnZonaB6.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaB6.getBackground().equals(Color.GREEN)){
-                    btnZonaB6.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-    }//GEN-LAST:event_btnZonaB6ActionPerformed
-
-    private void btnZonaB7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaB7ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaB7.getBackground().equals(Color.WHITE)) {
-                    btnZonaB7.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaB7.getBackground().equals(Color.GREEN)){
-                    btnZonaB7.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-    }//GEN-LAST:event_btnZonaB7ActionPerformed
-
-    private void btnZonaB8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaB8ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaB8.getBackground().equals(Color.WHITE)) {
-                    btnZonaB8.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaB8.getBackground().equals(Color.GREEN)){
-                    btnZonaB8.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-    }//GEN-LAST:event_btnZonaB8ActionPerformed
-
-    private void btnZonaB9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaB9ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaB9.getBackground().equals(Color.WHITE)) {
-                    btnZonaB9.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaB9.getBackground().equals(Color.GREEN)){
-                    btnZonaB9.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-    }//GEN-LAST:event_btnZonaB9ActionPerformed
-
-    private void btnZonaB10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaB10ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaB10.getBackground().equals(Color.WHITE)) {
-                    btnZonaB10.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaB10.getBackground().equals(Color.GREEN)){
-                    btnZonaB10.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-    }//GEN-LAST:event_btnZonaB10ActionPerformed
-
-    private void btnZonaB11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaB11ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaB11.getBackground().equals(Color.WHITE)) {
-                    btnZonaB11.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaB11.getBackground().equals(Color.GREEN)){
-                    btnZonaB11.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-    }//GEN-LAST:event_btnZonaB11ActionPerformed
-
-    private void btnZonaB12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaB12ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaB12.getBackground().equals(Color.WHITE)) {
-                    btnZonaB12.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaB12.getBackground().equals(Color.GREEN)){
-                    btnZonaB12.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-    }//GEN-LAST:event_btnZonaB12ActionPerformed
-
-    private void btnZonaB13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaB13ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaB13.getBackground().equals(Color.WHITE)) {
-                    btnZonaB13.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaB13.getBackground().equals(Color.GREEN)){
-                    btnZonaB13.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-    }//GEN-LAST:event_btnZonaB13ActionPerformed
-
-    private void btnZonaB14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaB14ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaB14.getBackground().equals(Color.WHITE)) {
-                    btnZonaB14.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaB14.getBackground().equals(Color.GREEN)){
-                    btnZonaB14.setBackground(Color.WHITE);
-                    estado=3;
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-    }//GEN-LAST:event_btnZonaB14ActionPerformed
-
-    private void btnZonaB15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZonaB15ActionPerformed
-        // TODO add your handling code here:
-        if(estado==1){
-            if (btnZonaB15.getBackground().equals(Color.WHITE)) {
-                    btnZonaB15.setBackground(Color.GREEN);
-                    estado=3;
-            }    
-        
-        }
-        if(estado == 2){
-            if (btnZonaB15.getBackground().equals(Color.GREEN)){
-                    btnZonaB15.setBackground(Color.WHITE);
-                    estado=3;    
-            }
-        }
-        if(estado == 0 ){
-            Utilidades.Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
-        }
-        btnguardar.setEnabled(true);
-    }//GEN-LAST:event_btnZonaB15ActionPerformed
-
     private void btnSelccionadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelccionadoActionPerformed
-        // TODO aqui haces la logica para guardar el vehiculo en un lugar
-        //usas get como en el que hice para el registro de vehiculos y conductores
-        getEstado();
-        btnSelccionado.setEnabled(false);
-        if(tipoEstado.equals("INGRESO")){
-            estado=1;
-        }else{
-            estado=2;
+        try {
+            // TODO aqui haces la logica para guardar el vehiculo en un lugar
+            //usas get como en el que hice para el registro de vehiculos y conductores
+            ArrayList<bahia> bah = null;
+            int bandera = 0;
+            getEstado();
+            String txt;
+            bah = gestor.TraerBahia();
+            btnSelccionado.setEnabled(false);
+            cbxVehiculo.setEnabled(false);
+            if(tipoEstado.equals("INGRESO")){
+                //Registro Entrada
+                estado=1;
+            }else{
+                //Registro Salida
+                for (int i = 0; i < bah.size(); i++) {
+                    if(bah.get(i).getPerIdentificacion().equals(getPlaca()) && estado == 0){
+                        for (int j = 0; j < listabt.size(); j++) {
+                            txt= listabt.get(j).getText();
+                            if(bah.get(i).getPuesto().equals(txt)){
+                                if(listabt.get(j).getBackground().equals(Color.GREEN)){
+                                    listabt.get(j).setBackground(Color.WHITE);
+                                    puesto = listabt.get(j).getText();
+                                    Utilidades.mensajeExito("La baia fue desmarcada Pulse guardar, para registrar el cambio", "Bahia desmarcada.");
+                                    estado=2;
+                                    btnguardar.setEnabled(true);
+                                    break;
+                                }else{
+                                    
+                                    Utilidades.mensajeExito("La placa no ah sido registrado en el ingreso", "Fallo al desmarcada Bahia.");
+                                    btnSelccionado.setEnabled(true);
+                                    setVisible(false);
+                                    cbxVehiculo.setEnabled(false);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (InterruptedException ex) {     
+            Logger.getLogger(GUIMapaParqueadero.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        
     }//GEN-LAST:event_btnSelccionadoActionPerformed
-
+    public String getMulfecha() {
+        Date now = new Date(System.currentTimeMillis());
+        SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat hour = new SimpleDateFormat("HH:mm:ss");
+        String fechaHora= date.format(now)+" "+ hour.format(now) ;
+        System.out.println(fechaHora);
+        return fechaHora;
+    }
     private void btnguardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnguardarActionPerformed
-        // TODO add your handling code here:
-        estado=0;
-        btnSelccionado.setEnabled(true);
-        btnguardar.setEnabled(false);
+        try {
+            // TODO add your handling code here:
+            String confirmacion;
+            estado=0;
+            btnSelccionado.setEnabled(true);
+            btnguardar.setEnabled(false);
+            String varPuesto = this.darPuesto();
+            String varPlaca =  this.getPlaca();
+            String varFecha = this.getMulfecha();
+            ArrayList<bahia> bah = null;
+            bah = gestor.TraerBahia();
+            if(getEstado().equals("INGRESO")){
+                bahia objBah = new bahia(estado,varPuesto,"",varFecha,"",varPlaca);
+                confirmacion = gestor.registrarIngreso(objBah);
+                Utilidades.mensajeExito(confirmacion, "Registro Exitoso.");
+                verMapa();
+                objReporte = new GUIReporteIngreso(varPlaca);
+                objReporte.setVisible(true);
+            
+            }else{ 
+                bahia objBah = new bahia(estado,varPuesto,"","",varFecha,varPlaca);
+                confirmacion = gestor.registrarSalida(objBah);
+                Utilidades.mensajeExito(confirmacion, "Registro de Salida Exitoso.");
+                this.dispose();
+                verMapa();
+            }
+        } catch (InterruptedException ex) {
+            Logger.getLogger(GUIMapaParqueadero.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_btnguardarActionPerformed
+
+    private void btnCerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCerrarActionPerformed
+        // TODO add your handling code here:
+        this.setVisible(false);
+        
+        //t1.stop();
+        
+    }//GEN-LAST:event_btnCerrarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1725,15 +833,19 @@ public class GUIMapaParqueadero extends javax.swing.JFrame implements AView{
         }
         //</editor-fold>
         //</editor-fold>
-
+    //public void recargarMapa() {
+        
+    }
         /* Create and display the form */
+/*
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new GUIMapaParqueadero().setVisible(true);
             }
         });
+    
     }
-
+*/
     public String getEstado(){
         int i;
         if (cbxSalidaEntrada.getSelectedIndex() == 0){
@@ -1744,17 +856,18 @@ public class GUIMapaParqueadero extends javax.swing.JFrame implements AView{
         }
         return tipoEstado;
     }
-    public void setPlacas(String prmPlacas[]){
-        int longitud = prmPlacas.length; 
+    public void setPlacas(String prmPlacas){
+       placa = prmPlacas; 
+    }
+    public String getPlaca(){
+        placa = (String) cbxVehiculo.getSelectedItem();
+        System.out.println(placa);
+        return placa;
     }
     
     
-    @Override
-    public void actualizar(AModel amodel) {
-    
-    }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private java.awt.Button btnCerrar;
     private javax.swing.JButton btnSelccionado;
     private javax.swing.JButton btnZonaA;
     private javax.swing.JButton btnZonaA1;
@@ -1813,11 +926,138 @@ public class GUIMapaParqueadero extends javax.swing.JFrame implements AView{
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JLabel lblLIbre;
+    private javax.swing.JPanel pnlDatos;
     // End of variables declaration//GEN-END:variables
+
+    private void llenarListaBotones() {
+        listabt.add(btnZonaA);
+        listabt.add(btnZonaA1);
+        listabt.add(btnZonaA2);
+        listabt.add(btnZonaA3);
+        listabt.add(btnZonaA4);
+        listabt.add(btnZonaA5);
+        listabt.add(btnZonaB1);
+        listabt.add(btnZonaB2);
+        listabt.add(btnZonaB3);
+        listabt.add(btnZonaB4);
+        listabt.add(btnZonaB5);
+        listabt.add(btnZonaB6);
+        listabt.add(btnZonaB7);
+        listabt.add(btnZonaB8);
+        listabt.add(btnZonaB9);
+        listabt.add(btnZonaB10);
+        listabt.add(btnZonaB11);
+        listabt.add(btnZonaB12);
+        listabt.add(btnZonaB13);
+        listabt.add(btnZonaB14);
+        listabt.add(btnZonaB15);
+        listabt.add(btnZonaC1);
+        listabt.add(btnZonaC2);
+        listabt.add(btnZonaC3);
+        listabt.add(btnZonaC4);
+        listabt.add(btnZonaC5);
+        listabt.add(btnZonaC6);
+        listabt.add(btnZonaC7);
+        listabt.add(btnZonaC8);
+        listabt.add(btnZonaC9);
+        listabt.add(btnZonaC10);
+        listabt.add(btnZonaC11);
+        listabt.add(btnZonaC12);
+        listabt.add(btnZonaD);
+        listabt.add(btnZonaD1);
+        listabt.add(btnZonaD2);
+        listabt.add(btnZonaD3);
+        listabt.add(btnZonaD4);
+        listabt.add(btnZonaD5);
+    }
+    private void agregarLisent(){
+        
+    }
+    
+    private void cargarpuestos() throws InterruptedException {
+        GestorBahia gestor = new GestorBahia();
+        ArrayList<bahia> bah = null;
+        bah = gestor.TraerBahia();
+        String txt ;
+        for (int i = 0; i < listabt.size(); i++) {
+            listabt.get(i).addActionListener(this);
+        }
+        if(bah.size() == 0){
+            for (int i = 0; i < listabt.size(); i++) {
+                 listabt.get(i).setBackground(Color.WHITE);
+            }
+        }else{
+            for (int j = 0; j < bah.size(); j++) {
+                for (int i = 0; i < listabt.size(); i++) {
+                    txt= listabt.get(i).getText();
+                    if(bah.get(j).getPuesto().equals(txt)){
+
+                        listabt.get(i).setBackground(Color.GREEN);
+                            //this.dispose();
+                    }else{
+                        if(!(listabt.get(i).getBackground().equals(Color.GREEN))){
+                             listabt.get(i).setBackground(Color.WHITE);
+
+                        }
+                    }
+
+                }
+            }
+    
+        }
+    }
+    public void verMapa(){
+            for (int i = 0; i < listabt.size(); i++) {
+                listabt.get(i).setEnabled(false);
+            }
+            pnlDatos.setVisible(false);
+            btnguardar.setVisible(false);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent ae) {
+        for (int i = 0; i < listabt.size(); i++) {
+            if(ae.getSource()== listabt.get(i)){
+                if(estado==1){
+                    if (listabt.get(i).getBackground().equals(Color.WHITE)) {
+                            listabt.get(i).setBackground(Color.GREEN);
+                            escribirPuesto(listabt.get(i).getText());
+                            estado=3;
+                    }    
+
+                }
+                if(estado == 2){
+                            estado=3;
+                }
+                
+                if(estado == 0 ){
+
+                    Utilidades.mensajeAdvertencia("PRIMERO SE DEBE SELECCIONAR SI ES ESTADO SALIDA O ES INGRESO DEL VEHICULO", "ADVERTENCIA");
+                }
+                if(estado == 3){    
+                    Utilidades.mensajeAdvertencia("HAGA CLICK EN EL BOTON GUARDAR, PARA REGISTRAR LA SALIDA O ENTRADA DEL VEHICULO", "ADVERTENCIA");
+                    btnguardar.setEnabled(true);
+                }
+            }
+        }                                         
+
+    }
+
+    private void llenarCombox(ArrayList<String> prmPlacas) {
+         for (int i = 0; i < prmPlacas.size(); i++) {
+            cbxVehiculo.addItem(prmPlacas.get(i));
+        }
+        
+    }
+    private String darPuesto(){
+        return puesto;
+    }
+    private void escribirPuesto(String prmPuesto){
+        puesto = prmPuesto;
+    }
 }

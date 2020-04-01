@@ -13,11 +13,13 @@ public class GUIBuscarVehPersonaController extends AActionController {
 
     private final GestorVehiculoPersona gestor;
     private final GUIBuscarVehPersona vista;
-
+    
+    
     public GUIBuscarVehPersonaController(AModel myModel, AView myView) {
         super(myModel, myView);
         this.vista = (GUIBuscarVehPersona) myView;
         this.gestor = (GestorVehiculoPersona) myModel;
+        
     }
 
     @Override

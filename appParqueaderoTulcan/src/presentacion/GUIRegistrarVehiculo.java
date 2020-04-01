@@ -5,6 +5,8 @@
  */
 package presentacion;
 
+import java.util.Observable;
+import java.util.Observer;
 import negocio.GestorVehiculo;
 import negocio.GestorVehiculoPersona;
 import negocio.Persona;
@@ -14,7 +16,7 @@ import negocio.Vehiculo;
  *
  * @author JUAN
  */
-public class GUIRegistrarVehiculo extends javax.swing.JInternalFrame {
+public class GUIRegistrarVehiculo extends javax.swing.JInternalFrame implements Observer{
     private final GestorVehiculo gestorVehiculo = new GestorVehiculo();
     private String idConductor;
     private String placaVehiculo, marca, tipoVehiculo;
@@ -164,22 +166,31 @@ public class GUIRegistrarVehiculo extends javax.swing.JInternalFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        String idConductor;
-        String placa, marca, tipoVehiculo, confirmacion;
-        placa = getPlaca();
-        marca = getMarca();
-        tipoVehiculo = getTipoVehiculo();
-        idConductor = getIdConductor();
-        Persona conductor = gestorUsuario.BuscarPersona(Integer.parseInt(idConductor));
-        if(conductor == null){
-            Utilidades.Utilidades.mensajeError("ERROR", "El conductor no se encuentra registrado");
-        }else{
-            Vehiculo objVehiculo = new Vehiculo(idConductor, placa, marca, tipoVehiculo);
-            confirmacion = gestorVehiculo.registrarVehiculo(objVehiculo);
-            Utilidades.Utilidades.mensajeExito(confirmacion, "Registro Exitoso.");
+
+        if(!validarCampos()){
+            String idConductor;
+            String placa, marca, tipoVehiculo, confirmacion;
+            placa = getPlaca();
+            marca = getMarca();
+            tipoVehiculo = getTipoVehiculo();
+            idConductor = getIdConductor();
+            Persona conductor = gestorUsuario.BuscarPersona(Integer.parseInt(idConductor));
+            if(conductor == null){
+                Utilidades.Utilidades.mensajeError("ERROR", "El conductor no se encuentra registrado");
+            }else{
+                Vehiculo objVehiculo = new Vehiculo(idConductor, placa, marca, tipoVehiculo);
+                confirmacion = gestorVehiculo.registrarVehiculo(objVehiculo);
+                Utilidades.Utilidades.mensajeExito(confirmacion, "Registro Exitoso.");
+            }
         }
     }//GEN-LAST:event_jButton1ActionPerformed
-    
+    public boolean validarCampos(){
+        if(txbIdentificacion.getText().isEmpty() || txbPlaca.getText().isEmpty() || txbMarca.getText().isEmpty()){
+            Utilidades.Utilidades.mensajeError("FALTA LLENAR CAMPOS PARA PODER HACER EL REGISTRO EXITOSO", "CAMPOS NULOS");
+            return true;
+        }
+        return false;
+    }
     public String getIdConductor(){
         idConductor = txbIdentificacion.getText();
         return idConductor;
@@ -217,4 +228,9 @@ public class GUIRegistrarVehiculo extends javax.swing.JInternalFrame {
     private javax.swing.JTextField txbMarca;
     private javax.swing.JTextField txbPlaca;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void update(Observable o, Object o1) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

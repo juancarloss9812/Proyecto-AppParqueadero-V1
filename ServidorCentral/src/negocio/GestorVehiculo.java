@@ -6,6 +6,8 @@
 package negocio;
 
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -15,24 +17,31 @@ public class GestorVehiculo {
     private final conectorJDBC conector;
     
     public GestorVehiculo(){
-        conector = new conectorJDBC();
-    }
-    public void registrarVehiculo(Vehiculo prmVehiculo) throws ClassNotFoundException, SQLException{
+        conector = (conectorJDBC.getInstance());
+        }
+    public void registrarVehiculo(Vehiculo prmVehiculo) {
         String sql;
         int identificacion = prmVehiculo.getId();
         String placa = prmVehiculo.getVehPlaca();
         String marca = prmVehiculo.getVehMarca();
         String tipoVehiculo = prmVehiculo.getVehTipo();
-        conector.conectarse();
-        sql = "INSERT INTO vehiculo(vehplaca, peridentificacion, vehmarca, vehtipo)"
+        try {
+            conector.conectarse();
+            sql = "INSERT INTO vehiculo(vehplaca, peridentificacion, vehmarca, vehtipo)"
                 + " VALUES ("
                 + "'" + placa + "',"
                 + "'" + identificacion + "',"
                 + "'" + marca + "',"
                 + "'" + tipoVehiculo+ "'"     
                 + ")";
-        conector.actualizar(sql);
-        conector.desconectarse();
+            conector.actualizar(sql);
+            conector.desconectarse();
+        } catch (ClassNotFoundException ex) {
+            Utilidades.Utilidades.mensajeError("AH OCURRIDO UN ERROR INESPERADO. ", "ERROR");
+        } catch (SQLException ex) {
+            Utilidades.Utilidades.mensajeError("AH OCURRIDO UN ERROR INESPERADO. ", "ERROR");
+        }
+        
     }
 
 }
